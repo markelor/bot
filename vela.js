@@ -84,7 +84,7 @@ const esMartilloBajistaPositivo = (open, high, low, close) => {
  * @returns nos retorna un double que indica el porcentaje del movimiento de la vela
  */
 const porcentajeMovimoentoVela = (high, low) => {
-    return  ((high - low)/ high)*100;
+    return  (high - low)/ high;
 }
 module.exports = {
     esVelaAlcista,

@@ -1,10 +1,18 @@
 
-require('dotenv').config;
+const dotenv = require('dotenv');
+dotenv.config();
 const Binance = require('node-binance-api');
 const tulind = require('tulind');
 const binance = new Binance().options({
   APIKEY: process.env.API_KEY,
-  APISECRET: process.env.API_SECRET
+  APISECRET: process.env.API_SECRET,
+  useServerTime: true,
+  reconnect: false,
+  verbose: true,
+  test: true,
+  urls: {
+    base: "https://testnet.binance.vision/api/"
+  }
 });
 /**
  * Función que calcula el RSI (fuerza relativa)
