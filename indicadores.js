@@ -6,13 +6,14 @@ const tulind = require('tulind');
 const binance = new Binance().options({
   APIKEY: process.env.API_KEY,
   APISECRET: process.env.API_SECRET,
-  useServerTime: true,
-  reconnect: false,
   verbose: true,
-  test: true,
+  test:true,
   urls: {
-    base: "https://testnet.binance.vision/api/"
-  }
+    base: 'https://testnet.binance.vision/api/',
+    combineStream: 'wss://testnet.binance.vision/stream?streams=',
+    stream: 'wss://testnet.binance.vision/ws/'
+ }
+
 });
 /**
  * Función que calcula el RSI (fuerza relativa)
