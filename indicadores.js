@@ -1,6 +1,5 @@
 
-const dotenv = require('dotenv');
-dotenv.config();
+
 const Binance = require('node-binance-api');
 const tulind = require('tulind');
 const binance = new Binance().options({
