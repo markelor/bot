@@ -1,4 +1,3 @@
-
 const Binance = require("node-binance-api");
 const binance = new Binance().options({
   APIKEY: process.env.API_KEY,
@@ -11,22 +10,62 @@ const binance = new Binance().options({
     stream: "wss://testnet.binance.vision/ws/",
   },
 });
-const monedas = process.env.MONEDAS.split(", ");
+/**
+ * Función que
+ */
+const precision = async () => {
+  try {
+    monedasInfo = await binance.futuresExchangeInfo();
+
+    const monedas = [];
+    let minQuantity;
+    for (let monedaInfo in monedasInfo.symbols) {
+      let obj = monedasInfo.symbols[monedaInfo];
+      for (let filter in obj.filters) {
+        let filtro = obj.filters[filter];
+        if (filtro.filterType === "LOT_SIZE") {
+          minQuantity = filtro.minQty;
+        }
+      }
+      process.env.MONEDAS.split(",").forEach((moneda) => {
+        if (moneda === obj.symbol) {
+          monedas.push({
+            name: moneda,
+            quantityPrecision: parseFloat(obj.quantityPrecision),
+            minQuantity: parseFloat(minQuantity),
+          });
+        }
+      });
+    }
+    return monedas;
+  } catch (error) {
+    console.log("error precision", error);
+  }
+};
 /**
  * Función que ajusta el tipo de orden
+ * @param {*} monedas
  */
-const ajustarTipo = async () => {
-  for (let moneda in monedas) {
-    await binance.futuresMarginType(moneda, "ISOLATED");
+const ajustarTipo = async (monedas) => {
+  try {
+    for (let moneda in monedas) {
+      await binance.futuresMarginType(monedas[moneda].name, "ISOLATED");
+    }
+  } catch (error) {
+    console.log("error ajustar tipo", error);
   }
 };
 /**
  * Funcion para ajustar el apalancamiento
  * @param {float} apalancamiento
  */
-const ajustarApalancamiento = async (apalancamiento) => {
-  for (let moneda in monedas) {
-    await binance.futuresLeverage(moneda, apalancamiento);
+const ajustarApalancamiento = async (symbol, apalancamiento) => {
+  try {
+    if (apalancamiento < 200) {
+      await binance.futuresLeverage(symbol, Math.round(apalancamiento));
+    }
+  } catch (error) {
+    console.log("error ajustar apalancamiento", error);
   }
 };
 /**
@@ -35,12 +74,16 @@ const ajustarApalancamiento = async (apalancamiento) => {
  */
 
 const calcularBalance = async () => {
-  balances = await binance.futuresBalance();
-  for (let asset in balances) {
-    let obj = balances[asset];
-    if (obj.asset === "USDT") {
-      return parseFloat(obj.balance);
+  try {
+    balances = await binance.futuresBalance();
+    for (let asset in balances) {
+      let obj = balances[asset];
+      if (obj.asset === "USDT") {
+        return parseFloat(obj.balance);
+      }
     }
+  } catch (error) {
+    console.log("error calcular balance", error);
   }
 };
 /**
@@ -74,4 +117,5 @@ module.exports = {
   calcularBalance,
   calcularUnidadesConPrecio,
   calcularApalancamiento,
+  precision,
 };
