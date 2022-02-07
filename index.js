@@ -121,11 +121,16 @@ const inicializar = async () => {
                 console.info("min-quantity", moneda.minQuantity);
                 console.info("open", velaActualOpen);
                 if (unidades > moneda.minQuantity) {
-                  compra = await binance.futuresBuy(
+                  compra = await binance.futuresOrder(
+                    "BUY",
                     symbol,
                     unidades,
-                    velaActualOpen.toFixed(moneda.quantityPrecision)
+                    velaActualOpen.toFixed(moneda.quantityPrecision),
+                    {
+                      type: "LIMIT",
+                    }
                   );
+
                   /* stopLost = await binance.futuresSell(
                     symbol,
                     unidades,
@@ -138,7 +143,7 @@ const inicializar = async () => {
                       ).toFixed(moneda.quantityPrecision),
                     }
                   );*/
-                  takeProfit = await binance.futuresSell(
+                  /* takeProfit = await binance.futuresSell(
                     symbol,
                     unidades,
                     false,
@@ -149,7 +154,7 @@ const inicializar = async () => {
                         (velaActualHigh - velaActualLow)
                       ).toFixed(moneda.quantityPrecision),
                     }
-                  );
+                  );*/
 
                   console.info("compra", compra);
                   //console.info("stopLost", stopLost);
@@ -164,19 +169,25 @@ const inicializar = async () => {
                 )
               ) {
                 // Limit en cierre
-                console.info("quantity precision", moneda.quantityPrecision);       
+                console.info("quantity precision", moneda.quantityPrecision);
                 const unidades = posiciones
                   .calcularUnidadesConPrecio(velaActualClose)
                   .toFixed(moneda.quantityPrecision);
-                  console.info("unidades", unidades);
-                  console.info("min-quantity", moneda.minQuantity);
-                  console.info("close", velaActualClose);
+                console.info("unidades", unidades);
+                console.info("min-quantity", moneda.minQuantity);
+                console.info("close", velaActualClose);
                 if (unidades > moneda.minQuantity) {
                   compra = await binance.futuresBuy(
                     symbol,
                     unidades,
-                    velaActualClose.toFixed(moneda.quantityPrecision)
-                    
+                    velaActualClose.toFixed(moneda.quantityPrecision),
+                    {
+                      type: "STOP_MARKET",
+                      stopPrice: (
+                        velaActualClose +
+                        (velaActualHigh - velaActualLow)
+                      ).toFixed(moneda.quantityPrecision),
+                    }
                   );
                   /*stopLost = await binance.futuresSell(
                     symbol,
@@ -188,7 +199,7 @@ const inicializar = async () => {
                         (velaActualClose - (velaActualHigh - velaActualLow)).toFixed(moneda.quantityPrecision),
                     }
                   );*/
-                  takeProfit = await binance.futuresSell(
+                  /*takeProfit = await binance.futuresSell(
                     symbol,
                     unidades,
                     false,
@@ -199,7 +210,7 @@ const inicializar = async () => {
                         (velaActualHigh - velaActualLow)
                       ).toFixed(moneda.quantityPrecision),
                     }
-                  );
+                  );*/
                   console.info("compra", compra);
                   //console.info("stopLost", stopLost);
                   console.info("takeProfit", takeProfit);
@@ -237,14 +248,21 @@ const inicializar = async () => {
                 const unidades = posiciones
                   .calcularUnidadesConPrecio(velaActualOpen)
                   .toFixed(moneda.quantityPrecision);
-                  console.info("unidades", unidades);
-                  console.info("min-quantity", moneda.minQuantity);
-                  console.info("close", velaActualOpen);
+                console.info("unidades", unidades);
+                console.info("min-quantity", moneda.minQuantity);
+                console.info("close", velaActualOpen);
                 if (unidades > moneda.minQuantity) {
                   venta = await binance.futuresSell(
                     symbol,
                     unidades,
-                    velaActualOpen.toFixed(moneda.quantityPrecision)
+                    velaActualOpen.toFixed(moneda.quantityPrecision),
+                    {
+                      type: "STOP_MARKET",
+                      stopPrice: (
+                        velaActualOpen -
+                        (velaActualHigh - velaActualLow)
+                      ).toFixed(moneda.quantityPrecision),
+                    }
                   );
                   /*stopLost = await binance.futuresSell(
                     symbol,
@@ -256,7 +274,7 @@ const inicializar = async () => {
                         (velaActualOpen + (velaActualHigh - velaActualLow)).toFixed(moneda.quantityPrecision),
                     }
                   );*/
-                  takeProfit = await binance.futuresSell(
+                  /*takeProfit = await binance.futuresSell(
                     symbol,
                     unidades,
                     false,
@@ -267,7 +285,7 @@ const inicializar = async () => {
                         (velaActualHigh - velaActualLow)
                       ).toFixed(moneda.quantityPrecision),
                     }
-                  );
+                  );*/
                   console.info("venta", venta);
                   //console.info("stopLost", stopLost);
                   console.info("takeProfit", takeProfit);
@@ -293,7 +311,14 @@ const inicializar = async () => {
                   venta = await binance.futuresSell(
                     symbol,
                     unidades,
-                    velaActualClose.toFixed(moneda.quantityPrecision)
+                    velaActualClose.toFixed(moneda.quantityPrecision),
+                    {
+                      type: "STOP_MARKET",
+                      stopPrice: (
+                        velaActualClose -
+                        (velaActualHigh - velaActualLow)
+                      ).toFixed(moneda.quantityPrecision),
+                    }
                   );
                   /*stopLost = await binance.futuresSell(
                     symbol,
@@ -305,7 +330,7 @@ const inicializar = async () => {
                         (velaActualClose + (velaActualHigh - velaActualLow)).toFixed(moneda.quantityPrecision),
                     }
                   );*/
-                  takeProfit = await binance.futuresSell(
+                  /*takeProfit = await binance.futuresSell(
                     symbol,
                     unidades,
                     false,
@@ -316,7 +341,7 @@ const inicializar = async () => {
                         (velaActualHigh - velaActualLow)
                       ).toFixed(moneda.quantityPrecision),
                     }
-                  );
+                  );*/
                   console.info("venta", venta);
                   //console.info("stopLost", stopLost);
                   console.info("takeProfit", takeProfit);
